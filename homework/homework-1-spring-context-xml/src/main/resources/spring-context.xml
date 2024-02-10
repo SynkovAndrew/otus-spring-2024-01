@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="questionReader" class="com.otus.spring.persistence.CsvQuestionReader">
+        <constructor-arg value="questions.csv"/>
+    </bean>
+
+    <bean id="consoleUi" class="com.otus.spring.ui.ConsoleUI" init-method="run">
+        <constructor-arg ref="questionReader"/>
+    </bean>
+</beans>
