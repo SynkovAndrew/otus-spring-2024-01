@@ -1,4 +1,6 @@
 package com.otus.spring.domain;
 
-public record Question(String value) {
+import java.util.Set;
+
+public record Question(String question, Set<Answer> answers) {
 }

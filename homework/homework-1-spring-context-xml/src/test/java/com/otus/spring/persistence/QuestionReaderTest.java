@@ -1,6 +1,9 @@
 package com.otus.spring.persistence;
 
+import com.otus.spring.configuration.ConfigurationProperties;
+import com.otus.spring.domain.Answer;
 import com.otus.spring.domain.Question;
+import com.otus.spring.domain.ReadingException;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
@@ -10,10 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class QuestionReaderTest {
+    private final QuestionEntityMapper questionEntityMapper = new QuestionEntityMapper();
 
     @Test
     void readQuestions() {
-        var questionReader = new CsvQuestionReader("questions.csv");
+        var questionFileNameProvider = new ConfigurationProperties("questions.csv");
+        var questionReader = new QuestionCsvReader(questionFileNameProvider, questionEntityMapper);
         var questions = questionReader.readAll();
 
         assertThat(questions)
@@ -21,20 +26,21 @@ public class QuestionReaderTest {
                 .ignoringCollectionOrder()
                 .isEqualTo(
                         Stream.of(
-                                new Question("Are you ...?"),
-                                new Question("Do you ...?"),
-                                new Question("Do you like ...?"),
-                                new Question("Have you been to ...?"),
-                                new Question("Are you interested in ...?")
+                                new Question("Are you ...?", Answer.allValues()),
+                                new Question("Do you ...?", Answer.allValues()),
+                                new Question("Do you like ...?", Answer.allValues()),
+                                new Question("Have you been to ...?", Answer.allValues()),
+                                new Question("Are you interested in ...?", Answer.allValues())
                         ).collect(Collectors.toList())
                 );
     }
 
     @Test
     void failedToReadQuestionsCauseFileNotFound() {
-        var questionReader = new CsvQuestionReader("file3.csv");
+        var questionFileNameProvider = new ConfigurationProperties("file3.csv");
+        var questionReader = new QuestionCsvReader(questionFileNameProvider, questionEntityMapper);
 
         assertThatThrownBy(questionReader::readAll)
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReadingException.class);
     }
 }

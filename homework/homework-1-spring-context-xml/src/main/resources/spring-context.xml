@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns="http://www.springframework.org/schema/beans"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util
+        https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="questionReader" class="com.otus.spring.persistence.CsvQuestionReader">
+    <bean id="configurationProperties" class="com.otus.spring.configuration.ConfigurationProperties">
         <constructor-arg value="questions.csv"/>
     </bean>
 
-    <bean id="consoleUi" class="com.otus.spring.ui.ConsoleUI" init-method="run">
+    <bean id="questionEntityMapper" class="com.otus.spring.persistence.QuestionEntityMapper"/>
+
+    <bean id="questionReader" class="com.otus.spring.persistence.QuestionCsvReader">
+        <constructor-arg ref="configurationProperties"/>
+        <constructor-arg ref="questionEntityMapper"/>
+    </bean>
+
+    <bean id="ioService" class="com.otus.spring.service.StreamIOService">
+        <constructor-arg index="0">
+            <util:constant static-field="java.lang.System.out"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="application" class="com.otus.spring.bootstrap.Application">
+        <constructor-arg ref="ioService"/>
         <constructor-arg ref="questionReader"/>
     </bean>
 </beans>
